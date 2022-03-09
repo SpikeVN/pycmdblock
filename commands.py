@@ -1,63 +1,5 @@
-import utils
-import json
-import worker
-
-
-class JsonText:
-    def __init__(
-            self,
-            raw: dict | list,
-            text: str = "",
-            color: str = "",
-            bold: bool = False,
-            italic: bool = False,
-            underline: bool = False,
-            strikethrough: bool = False,
-            reset: bool = False,
-    ):
-        self.raw = raw
-        self.text = text
-        self.color = color
-        self.bold = bold
-        self.italic = italic
-        self.underline = underline
-        self.strikethrough = strikethrough
-        self.reset = reset
-
-    def __str__(self):
-        return json.dumps(self.raw)
-
-
-class Position:
-    """
-    Represents a coordinates value with x, y, z values.
-    """
-    HERE = "~ ~ ~"
-
-    def __init__(self, x: int, y: int, z: int):
-        self.x = x
-        self.y = y
-        self.z = z
-
-    def __str__(self):
-        return f"{self.x} {self.y} {self.z}"
-
-
-class Volume:
-    """
-    Represents a cube.
-    """
-
-    def __init__(self, x: float, y: float, z: float, dx: float, dy: float, dz: float):
-        self.x = x
-        self.y = y
-        self.z = z
-        self.dx = dx
-        self.dy = dy
-        self.dz = dz
-        self.x2 = x + dx
-        self.y2 = y + dy
-        self.z2 = z + dz
+from . import utils
+from . import worker
 
 
 def conv(text: str, esc="&"):
@@ -70,31 +12,20 @@ def conv(text: str, esc="&"):
     """
     output = []
     raw = utils.convert(text, esc=esc)
-    if type(raw) == list:
-        for e in raw:
-            a = JsonText(
-                raw=raw,
-                text=e["text"],
-                color=e["color"],
-                bold=e["bold"] if e.keys().__contains__("bold") else False,
-                italic=e["italic"] if e.keys().__contains__("italic") else False,
-                underline=e["underline"] if e.keys().__contains__("underline") else False,
-                strikethrough=e["strikethrough"] if e.keys().__contains__("strikethrough") else False,
-                reset=e["reset"] if e.keys().__contains__("reset") else False
-            )
-            output.append(a)
-    else:
-        e = raw
-        return JsonText(
-            raw=raw,
+    if type(raw) != list:
+        raw = [raw]
+    for e in raw:
+        a = JSONText(
+            raw=e,
             text=e["text"],
             color=e["color"],
-            bold=e["bold"] if e.keys().__contains__("bold") else False,
-            italic=e["italic"] if e.keys().__contains__("italic") else False,
-            underline=e["underline"] if e.keys().__contains__("underline") else False,
-            strikethrough=e["strikethrough"] if e.keys().__contains__("strikethrough") else False,
-            reset=e["reset"] if e.keys().__contains__("reset") else False
+            bold=e.get("bold", False),
+            italic=e.get("italic", False),
+            underline=e.get("underline", False),
+            strikethrough=e.get("strikethrough", False),
+            reset=e.get("reset", False)
         )
+        output.append(a)
     return output
 
 
@@ -106,8 +37,16 @@ def say(text: str):
 
 
 # Avoids circular imports
-import target_selector
+# from .target_selector import Target
+from .nbt import *
 
 
-def tellraw(target: target_selector.Target, text: list[JsonText] | JsonText):
-    worker.construct(f"tellraw {target} {text}")
+def tellraw(target: any, text: list[JSONText] | JSONText):
+    txt = []
+    for i in text:
+        txt.append(i.raw)
+    worker.construct(f"tellraw {target} {txt}")
+
+
+def summon(entity: Entity, at: Position = "~ ~ ~"):
+    worker.construct(f"summon {entity.type} {at} {entity.nbt}")

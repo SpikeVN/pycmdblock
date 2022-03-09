@@ -2,20 +2,21 @@
 *how to mek minecraft commands?*
 ## Usage
 Using:
+
 ```python
 from pycmdblock import commands
 from pycmdblock.target_selector import Target
 
 commands.tellraw(
-        Target()
-            .all_player()
-            .distance(10)
-            .gamemode("c")
-            .team(False)
-            .volume(commands.Volume(x=0, y=0, z=0, dx=10, dy=10, dz=10))
-            .tag(False),
-        commands.conv("&a&lHello World!")
-    )
+    Target()
+        .all_players()
+        .distance(10)
+        .gamemode("c")
+        .team(False)
+        .volume(commands.Volume(x=0, y=0, z=0, dx=10, dy=10, dz=10))
+        .tag(False),
+    commands.conv("&a&lHello World!")
+)
 ```
 should give the following output:
 ```

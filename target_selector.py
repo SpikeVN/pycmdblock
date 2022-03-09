@@ -1,4 +1,3 @@
-import commands
 
 
 class Target:
@@ -7,7 +6,7 @@ class Target:
 
     def __str__(self):
         self.raw = self.raw[:-1]
-        self.raw += "]"
+        self.raw += "]" if len(self.raw) > 2 else ""
         return self.raw
 
     # Choosing range
@@ -16,7 +15,7 @@ class Target:
             raise SyntaxError("Cannot select two selector. Consider using limit().")
         self.raw = "@p"
 
-    def all_player(self):
+    def all_players(self):
         if self.raw.__contains__("@"):
             raise SyntaxError("Cannot select two selector. Consider using limit().")
         self.raw = "@a["
@@ -62,6 +61,8 @@ class Target:
             raise ValueError(f"Distance cannot be negative. Received {distance}")
         self.raw += f"distance{operator}{distance},"
         return self
+
+    from . import commands
 
     def volume(self, v: commands.Volume):
         """
@@ -138,7 +139,7 @@ class Target:
         self.raw += assemble_operator("level", operator, value)
         return self
 
-    def gamemode(self, gamemode, operator: str = "="):
+    def gamemode(self, gamemode: str, operator: str = "="):
         """
         If the target has or doesn't have gamemode.
 

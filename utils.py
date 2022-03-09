@@ -89,3 +89,19 @@ def convert(text: str, esc: str = '&', suggest_command: str = None, hover_text=N
         output[i].pop("None")
 
     return output if len(output) > 1 else output[0]
+
+
+def text(text: list):
+    output = []
+    for i in text:
+        output.append(i.raw)
+    return output
+
+
+def asm_item(item):
+    if item is None:
+        return "{}"
+    output = "{" + f"id:\"{item.name}\",Count:{item.amount}b,"
+    output += f"tag:{item.nbt}" if item.nbt != "{}" else ""
+    output += "}"
+    return output
